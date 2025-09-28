@@ -1,15 +1,20 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, usePage } from '@inertiajs/react'; // <-- Tambahkan usePage
+import { Head, useForm, usePage } from '@inertiajs/react';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 
 export default function Create({ auth, client, packages }) {
-    const { flash } = usePage().props; // <-- Tambahkan baris ini
+    const { flash } = usePage().props;
     const { data, setData, post, processing, errors } = useForm({
         user_id: client.id,
         package_id: '',
     });
+
+    // --- BARIS DEBUGGING DIMULAI DI SINI ---
+    console.log("PROPS PACKAGES YANG DITERIMA:", packages);
+    console.log("STATE FORM SAAT INI:", data);
+    // --- BARIS DEBUGGING SELESAI ---
 
     const submit = (e) => {
         e.preventDefault();
@@ -25,7 +30,6 @@ export default function Create({ auth, client, packages }) {
 
             <div className="py-12">
                 <div className="max-w-2xl mx-auto sm:px-6 lg:px-8">
-                    {/* BAGIAN UNTUK MENAMPILKAN ERROR */}
                     {flash?.error && (
                         <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
                             <p className="font-bold">Terjadi Kesalahan</p>

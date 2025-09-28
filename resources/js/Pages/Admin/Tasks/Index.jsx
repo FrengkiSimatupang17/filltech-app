@@ -34,7 +34,7 @@ export default function Index({ auth, tasks, technicians }) {
                              <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul Tugas</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul & Tipe Tugas</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klien</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teknisi & Bukti</th>
@@ -44,16 +44,25 @@ export default function Index({ auth, tasks, technicians }) {
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {tasks.map((task) => (
                                         <tr key={task.id}>
-                                            <td className="px-6 py-4 whitespace-nowrap">{task.title}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{task.client.name}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap capitalize">{task.status.replace('_', ' ')}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm font-medium text-gray-900">{task.title}</div>
+                                                <div className="text-sm text-gray-500">
+                                                    {task.type === 'installation' ? 'Pemasangan Baru' : 'Perbaikan'}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{task.client.name}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 capitalize">
+                                                    {task.status.replace('_', ' ')}
+                                                </span>
+                                            </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {task.technician?.name || '-'}
                                                 {task.proof_path && (
-                                                    <a 
-                                                        href={`/storage/${task.proof_path}`} 
-                                                        target="_blank" 
-                                                        rel="noopener noreferrer" 
+                                                    <a
+                                                        href={`/storage/${task.proof_path}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
                                                         className="ml-2 text-sm text-blue-600 hover:underline"
                                                     >
                                                         (Lihat Bukti)

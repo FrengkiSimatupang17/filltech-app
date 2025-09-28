@@ -50,16 +50,15 @@ class ClientSubscriptionController extends Controller
                 'status' => 'pending_installation',
             ]);
 
-            $installationAmount = 0;
             Invoice::create([
                 'invoice_number' => 'INV/' . Carbon::now()->format('Ymd') . '/' . $user->id . '/INSTALL',
                 'user_id' => $user->id,
                 'subscription_id' => $subscription->id,
-                'amount' => $installationAmount,
-                'status' => $installationAmount > 0 ? 'pending' : 'paid',
+                'amount' => 0,
+                'status' => 'paid',
                 'type' => 'installation',
-                'due_date' => Carbon::now()->addDays(3),
-                'paid_at' => $installationAmount > 0 ? null : now(),
+                'due_date' => Carbon::now(),
+                'paid_at' => now(),
             ]);
 
             Task::create([
@@ -74,6 +73,7 @@ class ClientSubscriptionController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
+            // Kembalikan ke versi aman yang menampilkan notifikasi error
             return redirect()->back()->with('error', 'Gagal membuat langganan: ' . $e->getMessage());
         }
 

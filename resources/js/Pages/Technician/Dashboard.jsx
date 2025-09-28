@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage, router } from '@inertiajs/react'; // <-- Tambahkan 'router'
 import PrimaryButton from '@/Components/PrimaryButton';
 import { useState } from 'react';
 import InputError from '@/Components/InputError';
@@ -7,26 +7,28 @@ import InputLabel from '@/Components/InputLabel';
 
 export default function Dashboard({ auth, tasks }) {
     const { flash } = usePage().props;
-    const { patch, processing: patchProcessing } = useForm();
     
-    // Form baru untuk handle upload file
-    const { data, setData, post, processing: postProcessing, errors } = useForm({
+    // Form ini HANYA untuk aksi "Selesai" yang butuh upload file
+    const { data, setData, post: postCompletion, processing: postProcessing, errors } = useForm({
         status: 'completed',
         proof_photo: null,
     });
 
     const [completingTaskId, setCompletingTaskId] = useState(null);
 
+    // FUNGSI INI KITA PERBAIKI SECARA TOTAL
     const handleStartTask = (task) => {
-        patch(route('technician.tasks.update-status', { task: task.id, status: 'in_progress' }), {
-            preserveScroll: true,
+        // Gunakan router.post secara langsung untuk aksi sederhana
+        router.post(route('technician.tasks.update-status', { task: task.id }), {
+            status: 'in_progress', // Kirim data status di sini
+        }, {
+            preserveScroll: true, // Opsi untuk tidak scroll ke atas
         });
     };
     
     const submitCompletion = (e, task) => {
         e.preventDefault();
-        // Gunakan 'post' karena kita mengirim file
-        post(route('technician.tasks.update-status', { task: task.id }), {
+        postCompletion(route('technician.tasks.update-status', { task: task.id }), {
             onSuccess: () => setCompletingTaskId(null),
         });
     }
@@ -51,10 +53,21 @@ export default function Dashboard({ auth, tasks }) {
                                 {tasks.length > 0 ? (
                                     tasks.map((task) => (
                                         <div key={task.id} className="p-4 border rounded-lg">
-                                            {/* ... Detail tugas tetap sama ... */}
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <p className="font-bold text-lg">{task.title}</p>
+                                                    <p className="text-sm text-gray-600">Klien: {task.client.name}</p>
+                                                    <p className="text-sm text-gray-600">No. HP: {task.client.phone_number}</p>
+                                                    <p className="text-sm text-gray-600">Alamat: RT {task.client.rt}/RW {task.client.rw}, Blok {task.client.block} No. {task.client.house_number}</p>
+                                                </div>
+                                                <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 capitalize">
+                                                    {task.status.replace('_', ' ')}
+                                                </span>
+                                            </div>
                                             <div className="mt-4 flex space-x-2 justify-end">
                                                 {task.status === 'assigned' && (
-                                                    <PrimaryButton onClick={() => handleStartTask(task)} disabled={patchProcessing}>
+                                                    // Kita tidak perlu 'disabled' di sini karena router Inertia punya state loading global
+                                                    <PrimaryButton onClick={() => handleStartTask(task)}>
                                                         Mulai Kerjakan
                                                     </PrimaryButton>
                                                 )}
@@ -65,7 +78,6 @@ export default function Dashboard({ auth, tasks }) {
                                                 )}
                                             </div>
                                             
-                                            {/* FORM UPLOAD MUNCUL DI SINI */}
                                             {completingTaskId === task.id && (
                                                 <form onSubmit={(e) => submitCompletion(e, task)} className="mt-4 border-t pt-4">
                                                     <InputLabel htmlFor="proof_photo" value="Unggah Bukti Foto Pemasangan" />

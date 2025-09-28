@@ -10,6 +10,9 @@ use App\Http\Controllers\Admin\ClientSubscriptionController;
 use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Technician\TaskController as TechnicianTaskController;
+use App\Http\Controllers\Client\PaymentController;
+use App\Http\Controllers\Client\ComplaintController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -57,7 +60,13 @@ Route::middleware(['auth', 'role:admin,superuser'])->prefix('admin')->name('admi
 });
 
 Route::middleware(['auth', 'role:technician'])->prefix('technician')->name('technician.')->group(function () {
-    Route::patch('tasks/{task}/update-status', [TechnicianTaskController::class, 'updateStatus'])->name('tasks.update-status');
+    Route::post('tasks/{task}/update-status', [TechnicianTaskController::class, 'updateStatus'])->name('tasks.update-status');
 });
+
+Route::middleware(['auth', 'role:client'])->prefix('client')->name('client.')->group(function () {
+    Route::post('invoices/{invoice}/pay', [PaymentController::class, 'store'])->name('invoices.pay');
+    Route::post('complaints', [ComplaintController::class, 'store'])->name('complaints.store');
+});
+
 
 require __DIR__.'/auth.php';

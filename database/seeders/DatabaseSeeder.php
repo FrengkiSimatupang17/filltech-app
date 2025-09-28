@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
         // Panggil seeder yang kita buat
         $this->call([
             UserSeeder::class,
+            PackageSeeder::class,
             // Anda bisa menambahkan seeder lain di sini nanti, misal PackageSeeder
         ]);
     }

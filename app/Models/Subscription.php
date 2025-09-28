@@ -10,13 +10,22 @@ class Subscription extends Model
 {
     use HasFactory;
 
-    // PASTIKAN BAGIAN INI SUDAH BENAR
     protected $fillable = [
         'user_id',
         'package_id',
         'status',
         'activated_at',
         'next_billing_date',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'activated_at' => 'datetime',
+        'next_billing_date' => 'date',
     ];
 
     public function user(): BelongsTo
