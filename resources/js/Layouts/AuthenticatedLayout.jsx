@@ -9,6 +9,7 @@ export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     const isAdmin = user.role === 'admin' || user.role === 'superuser';
+    const isTechnician = user.role === 'technician';
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -26,7 +27,15 @@ export default function Authenticated({ user, header, children }) {
                                 <NavLink href={route('dashboard')} active={route().current('dashboard')}>
                                     Dashboard
                                 </NavLink>
-                                {/* Tampilkan Menu Admin jika rolenya sesuai */}
+
+                                {/* Menu Khusus Teknisi */}
+                                {isTechnician && (
+                                    <NavLink href={route('technician.equipment.index')} active={route().current('technician.equipment.index')}>
+                                        Peminjaman Alat
+                                    </NavLink>
+                                )}
+                                
+                                {/* Menu Khusus Admin & Superuser */}
                                 {isAdmin && (
                                     <>
                                         <NavLink href={route('admin.packages.index')} active={route().current('admin.packages.index')}>
@@ -37,6 +46,9 @@ export default function Authenticated({ user, header, children }) {
                                         </NavLink>
                                         <NavLink href={route('admin.tasks.index')} active={route().current('admin.tasks.index')}>
                                             Manajemen Tugas
+                                        </NavLink>
+                                        <NavLink href={route('admin.invoices.index')} active={route().current('admin.invoices.index')}>
+                                            Manajemen Tagihan
                                         </NavLink>
                                         <NavLink href={route('admin.equipment.index')} active={route().current('admin.equipment.index')}>
                                             Manajemen Alat
@@ -117,7 +129,15 @@ export default function Authenticated({ user, header, children }) {
                         <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
                             Dashboard
                         </ResponsiveNavLink>
-                         {/* Tampilkan Menu Admin Mobile jika rolenya sesuai */}
+                        
+                        {/* Menu Mobile Teknisi */}
+                        {isTechnician && (
+                             <ResponsiveNavLink href={route('technician.equipment.index')} active={route().current('technician.equipment.index')}>
+                                Peminjaman Alat
+                            </ResponsiveNavLink>
+                        )}
+                        
+                        {/* Menu Mobile Admin */}
                         {isAdmin && (
                             <>
                                 <ResponsiveNavLink href={route('admin.packages.index')} active={route().current('admin.packages.index')}>
@@ -125,6 +145,18 @@ export default function Authenticated({ user, header, children }) {
                                 </ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('admin.users.index')} active={route().current('admin.users.index')}>
                                     Manajemen User
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('admin.tasks.index')} active={route().current('admin.tasks.index')}>
+                                    Manajemen Tugas
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('admin.invoices.index')} active={route().current('admin.invoices.index')}>
+                                    Manajemen Tagihan
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('admin.equipment.index')} active={route().current('admin.equipment.index')}>
+                                    Manajemen Alat
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('admin.attendance.qrcode')} active={route().current('admin.attendance.qrcode')}>
+                                    QR Absensi
                                 </ResponsiveNavLink>
                             </>
                         )}

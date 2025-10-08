@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\QrCodeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Technician\TaskController as TechnicianTaskController;
 use App\Http\Controllers\Technician\AttendanceController;
+use App\Http\Controllers\Technician\EquipmentController as TechnicianEquipmentController;
 use App\Http\Controllers\Client\PaymentController;
 use App\Http\Controllers\Client\ComplaintController;
 
@@ -79,6 +80,11 @@ Route::middleware(['auth', 'role:technician'])->prefix('technician')->name('tech
     // Attendance Routes
     Route::get('attendance/scanner', [AttendanceController::class, 'scanner'])->name('attendance.scanner');
     Route::post('attendance', [AttendanceController::class, 'store'])->name('attendance.store');
+
+    // Equipment Routes
+    Route::get('equipment', [TechnicianEquipmentController::class, 'index'])->name('equipment.index'); // <-- ROUTE YANG HILANG
+    Route::post('equipment/{equipment}/borrow', [TechnicianEquipmentController::class, 'borrow'])->name('equipment.borrow');
+    Route::post('equipment/{equipment}/return', [TechnicianEquipmentController::class, 'returnItem'])->name('equipment.return');
 });
 
 // CLIENT ROUTES
