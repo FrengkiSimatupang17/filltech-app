@@ -38,6 +38,12 @@ export default function Authenticated({ user, header, children }) {
                                         <NavLink href={route('admin.tasks.index')} active={route().current('admin.tasks.index')}>
                                             Manajemen Tugas
                                         </NavLink>
+                                        <NavLink href={route('admin.equipment.index')} active={route().current('admin.equipment.index')}>
+                                            Manajemen Alat
+                                        </NavLink>
+                                        <NavLink href={route('admin.attendance.qrcode')} active={route().current('admin.attendance.qrcode')}>
+                                            QR Absensi
+                                        </NavLink>
                                     </>
                                 )}
                             </div>

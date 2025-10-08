@@ -1,14 +1,14 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, usePage, router } from '@inertiajs/react'; // <-- Tambahkan 'router'
+import { Head, useForm, usePage, router, Link } from '@inertiajs/react';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { useState } from 'react';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 
-export default function Dashboard({ auth, tasks }) {
+export default function Dashboard({ auth, tasks, todaysAttendance }) {
     const { flash } = usePage().props;
     
-    // Form ini HANYA untuk aksi "Selesai" yang butuh upload file
+    // Form ini untuk aksi "Selesai" yang butuh upload file
     const { data, setData, post: postCompletion, processing: postProcessing, errors } = useForm({
         status: 'completed',
         proof_photo: null,
@@ -16,13 +16,11 @@ export default function Dashboard({ auth, tasks }) {
 
     const [completingTaskId, setCompletingTaskId] = useState(null);
 
-    // FUNGSI INI KITA PERBAIKI SECARA TOTAL
     const handleStartTask = (task) => {
-        // Gunakan router.post secara langsung untuk aksi sederhana
         router.post(route('technician.tasks.update-status', { task: task.id }), {
-            status: 'in_progress', // Kirim data status di sini
+            status: 'in_progress',
         }, {
-            preserveScroll: true, // Opsi untuk tidak scroll ke atas
+            preserveScroll: true,
         });
     };
     
@@ -46,6 +44,43 @@ export default function Dashboard({ auth, tasks }) {
                             <p>{flash.success}</p>
                         </div>
                     )}
+                    {flash?.error && (
+                        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                            <p>{flash.error}</p>
+                        </div>
+                    )}
+
+                    {/* KARTU ABSENSI DENGAN QR CODE */}
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                        <div className="p-6 text-gray-900 flex justify-between items-center">
+                            <div>
+                                <h3 className="text-lg font-medium">Absensi Hari Ini</h3>
+                                <p className="text-sm text-gray-500">
+                                    {todaysAttendance && todaysAttendance.clock_in ? 
+                                     `Anda Clock-In pada: ${new Date(todaysAttendance.clock_in).toLocaleTimeString('id-ID')}` : 
+                                     'Anda belum melakukan Clock-In hari ini.'}
+                                </p>
+                                {todaysAttendance && todaysAttendance.clock_out && (
+                                    <p className="text-sm text-green-600">
+                                        Anda sudah Clock-Out hari ini pada: {new Date(todaysAttendance.clock_out).toLocaleTimeString('id-ID')}
+                                    </p>
+                                )}
+                            </div>
+                            <div>
+                                {!todaysAttendance && (
+                                    <Link href={route('technician.attendance.scanner')} as="button" className="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        Clock In
+                                    </Link>
+                                )}
+                                {todaysAttendance && !todaysAttendance.clock_out && (
+                                    <Link href={route('technician.attendance.scanner')} as="button" className="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        Clock Out
+                                    </Link>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
                             <h3 className="text-lg font-medium">Daftar Tugas Anda</h3>
@@ -66,7 +101,6 @@ export default function Dashboard({ auth, tasks }) {
                                             </div>
                                             <div className="mt-4 flex space-x-2 justify-end">
                                                 {task.status === 'assigned' && (
-                                                    // Kita tidak perlu 'disabled' di sini karena router Inertia punya state loading global
                                                     <PrimaryButton onClick={() => handleStartTask(task)}>
                                                         Mulai Kerjakan
                                                     </PrimaryButton>
