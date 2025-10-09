@@ -105,7 +105,7 @@ export default function Index({ auth, reports, filters }) {
                                                 <td className="px-6 py-4 whitespace-nowrap text-right">{formatCurrency(item.total)}</td>
                                             </tr>
                                         ))}
-                                    </tbody>
+                                    </tbody>a
                                 </table>
                             </div>
                         </div>
