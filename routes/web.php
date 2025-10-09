@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ClientSubscriptionController;
 use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\Admin\InvoiceController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Admin\QrCodeController;
 use App\Http\Controllers\DashboardController;
@@ -55,6 +56,7 @@ Route::middleware(['auth', 'role:admin,superuser'])->prefix('admin')->name('admi
     Route::resource('packages', PackageController::class);
     Route::resource('users', UserController::class)->except(['destroy', 'show']);
     Route::resource('equipment', EquipmentController::class);
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
 
     // Subscription Routes
     Route::get('users/{user}/subscriptions/create', [ClientSubscriptionController::class, 'create'])->name('client-subscriptions.create');
