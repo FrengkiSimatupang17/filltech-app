@@ -7,6 +7,7 @@ use Inertia\Inertia;
 
 
 // Import semua controller yang dibutuhkan
+use App\Http\Controllers\Superuser\ActivityLogController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ClientSubscriptionController;
@@ -44,6 +45,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+//SUPERUSER ROUTES
+Route::middleware(['auth', 'role:superuser'])->prefix('superuser')->name('superuser.')->group(function () {
+    Route::get('activity-log', [ActivityLogController::class, 'index'])->name('activity-log.index');
 });
 
 // ADMIN ROUTES

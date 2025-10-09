@@ -14,7 +14,7 @@ const ToolsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w
 const WifiIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.555a5.5 5.5 0 017.778 0M12 20.25a.75.75 0 100-1.5.75.75 0 000 1.5zM4.444 12.889a10 10 0 0115.112 0" /></svg>;
 const InvoiceIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>;
 const QrIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /><path d="M3 3h2v2H3zm16 16h2v2h-2zM3 19h2v2H3zm16-16h2v2h-2zM9 3h2v2H9zm6 0h2v2h-2zM3 9h2v2H3zm18 0h-2v2h2zM9 19h2v2H9zm6 0h2v2h-2z" /></svg>;
-
+const LogIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>;
 
 export default function Authenticated({ user, header, children }) {
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -22,6 +22,7 @@ export default function Authenticated({ user, header, children }) {
 
     const isAdmin = user.role === 'admin' || user.role === 'superuser';
     const isTechnician = user.role === 'technician';
+    const isSuperuser = user.role === 'superuser';
 
     const SidebarContent = ({ isCollapsed }) => (
         <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
@@ -31,7 +32,7 @@ export default function Authenticated({ user, header, children }) {
                         <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
                     </span>
                     <span className={`transition-opacity duration-200 ${!isCollapsed && 'md:hidden'}`}>
-                        <svg className="h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 21a9 9 0 100-18 9 9 0 000 18z"/><path d="M12 3v1m0 16v1m8-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/></svg>
+                        <svg className="h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 21a9 9 0 100-18 9 9 0 000 18z"/><path d="M12 3v1m0 16v1m8-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/></svg>
                     </span>
                 </Link>
             </div>
@@ -59,6 +60,16 @@ export default function Authenticated({ user, header, children }) {
                         <NavLink href={route('admin.equipment.index')} active={route().current('admin.equipment.index')} className={`justify-center md:justify-start`}><ToolsIcon /><span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Manajemen Alat</span></NavLink>
                         <NavLink href={route('admin.reports.index')} active={route().current('admin.reports.index')} className={`justify-center md:justify-start`}><ReportIcon /><span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Laporan</span></NavLink>
                         <NavLink href={route('admin.attendance.qrcode')} active={route().current('admin.attendance.qrcode')} className={`justify-center md:justify-start`}><QrIcon /><span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>QR Absensi</span></NavLink>
+                    </>
+                )}
+
+                {isSuperuser && (
+                    <>
+                        <p className={`px-4 pt-4 text-xs font-semibold text-gray-400 uppercase ${isCollapsed && 'md:hidden'}`}>Superuser</p>
+                        <NavLink href={route('superuser.activity-log.index')} active={route().current('superuser.activity-log.index')} className={`justify-center md:justify-start`}>
+                            <LogIcon />
+                            <span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Log Aktivitas</span>
+                        </NavLink>
                     </>
                 )}
             </nav>
@@ -110,10 +121,8 @@ export default function Authenticated({ user, header, children }) {
                     <button onClick={() => setMobileSidebarOpen(true)} className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none md:hidden">
                         <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
-                    <div className="flex-1 px-4 flex justify-between">
-                        <div className="flex-1 flex">
-                            {/* Bisa ditambahkan search bar di sini nanti */}
-                        </div>
+                    <div className="flex-1 px-4 flex justify-between items-center">
+                        <div>{header}</div>
                         <div className="ml-4 flex items-center md:ml-6">
                             <div className="ms-3 relative">
                                 <Dropdown>
@@ -136,13 +145,10 @@ export default function Authenticated({ user, header, children }) {
                 </div>
 
                 <main>
-                    {header && (
-                        <header className="bg-white shadow">
-                            <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
-                        </header>
-                    )}
                     <div className="py-6">
-                        {children}
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                            {children}
+                        </div>
                     </div>
                 </main>
             </div>
