@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // <-- IMPORT INI
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Invoice extends Model
 {
@@ -23,18 +23,28 @@ class Invoice extends Model
     ];
 
     /**
-     * Definisikan relasi: Satu Invoice bisa memiliki banyak catatan pembayaran.
+     * Casts untuk memastikan kolom tanggal menjadi objek Carbon.
      */
+    protected $casts = [
+        'due_date' => 'date',
+        'paid_at' => 'datetime',
+    ];
+
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
     }
 
-    /**
-     * Definisikan relasi: Satu Invoice pasti dimiliki oleh satu User.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Definisikan relasi: Satu Invoice terikat pada satu Subscription.
+     */
+    public function subscription(): BelongsTo
+    {
+        return $this->belongsTo(Subscription::class);
     }
 }

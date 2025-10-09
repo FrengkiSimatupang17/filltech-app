@@ -152,6 +152,9 @@ export default function Dashboard({ auth, activeSubscription, invoices = [] }) {
                                                                 </span>
                                                             </td>
                                                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                                                                <a href={route('client.invoices.show', invoice.id)} target="_blank" className="text-gray-600 hover:text-gray-900 mr-4">
+                                                                    Download
+                                                                    </a>
                                                                 {invoice.status === 'pending' && !hasPendingPayment && (
                                                                     <button onClick={() => setPayingInvoiceId(invoice.id)} className="text-indigo-600 hover:text-indigo-900">
                                                                         Bayar

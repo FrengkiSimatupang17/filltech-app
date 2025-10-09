@@ -22,6 +22,7 @@ use App\Http\Controllers\Technician\AttendanceController;
 use App\Http\Controllers\Technician\EquipmentController as TechnicianEquipmentController;
 use App\Http\Controllers\Client\PaymentController;
 use App\Http\Controllers\Client\ComplaintController;
+use App\Http\Controllers\Client\InvoiceController as ClientInvoiceController;
 
 
 /*
@@ -99,6 +100,7 @@ Route::middleware(['auth', 'role:technician'])->prefix('technician')->name('tech
 Route::middleware(['auth', 'role:client'])->prefix('client')->name('client.')->group(function () {
     Route::post('invoices/{invoice}/pay', [PaymentController::class, 'store'])->name('invoices.pay');
     Route::post('complaints', [ComplaintController::class, 'store'])->name('complaints.store');
+    Route::get('invoices/{invoice}', [ClientInvoiceController::class, 'show'])->name('invoices.show');
 });
 
 
