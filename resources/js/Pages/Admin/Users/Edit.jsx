@@ -11,6 +11,7 @@ export default function Edit({ auth, user }) {
         email: user.email || '',
         role: user.role || 'client',
         phone_number: user.phone_number || '',
+        address: user.address || '', // <-- Tambahkan state ini
         rt: user.rt || '',
         rw: user.rw || '',
         block: user.block || '',
@@ -36,7 +37,7 @@ export default function Edit({ auth, user }) {
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
                             <form onSubmit={submit}>
-                               <div>
+                                <div>
                                     <InputLabel htmlFor="name" value="Nama" />
                                     <TextInput id="name" name="name" value={data.name} className="mt-1 block w-full" onChange={(e) => setData('name', e.target.value)} />
                                     <InputError message={errors.name} className="mt-2" />
@@ -54,6 +55,20 @@ export default function Edit({ auth, user }) {
                                     <InputError message={errors.phone_number} className="mt-2" />
                                 </div>
 
+                                {/* --- INPUT ALAMAT LENGKAP DITAMBAHKAN DI SINI --- */}
+                                <div className="mt-4">
+                                    <InputLabel htmlFor="address" value="Alamat Lengkap (Opsional)" />
+                                    <textarea
+                                        id="address"
+                                        name="address"
+                                        value={data.address}
+                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                        onChange={(e) => setData('address', e.target.value)}
+                                        rows="3"
+                                    ></textarea>
+                                    <InputError message={errors.address} className="mt-2" />
+                                </div>
+                                
                                 <div className="mt-4">
                                     <InputLabel htmlFor="role" value="Role" />
                                     <select id="role" name="role" value={data.role} className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" onChange={(e) => setData('role', e.target.value)}>
@@ -67,7 +82,10 @@ export default function Edit({ auth, user }) {
                                 
                                 {data.role === 'client' && (
                                      <>
-                                        <div className="grid grid-cols-2 gap-4 mt-4">
+                                        <div className="mt-2">
+                                            <p className="text-sm text-gray-600">Detail Alamat (Wajib untuk ID Pelanggan)</p>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4 mt-2">
                                             <div>
                                                 <InputLabel htmlFor="rt" value="RT" />
                                                 <TextInput id="rt" type="text" name="rt" value={data.rt} className="mt-1 block w-full" onChange={(e) => setData('rt', e.target.value)} />

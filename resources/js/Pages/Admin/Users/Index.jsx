@@ -75,6 +75,18 @@ export default function Index({ auth, users }) {
                                                             Edit
                                                             </Link>
                                                     )}
+
+                                                    {(loggedInUser.role === 'superuser' || (loggedInUser.role === 'admin' && user.role !== 'admin' && user.role !== 'superuser')) && user.id !== loggedInUser.id && (
+                                                        <Link
+                                                        href={route('admin.users.destroy', user.id)}
+                                                        method="delete"
+                                                        as="button"
+                                                        onBefore={() => confirm('Anda yakin ingin menghapus pengguna ini?')}
+                                                        className="text-red-600 hover:text-red-900 ml-4"
+                                                        >
+                                                            Hapus
+                                                        </Link>
+                                                    )}
                                                 </td>
                                             </tr>
                                         )

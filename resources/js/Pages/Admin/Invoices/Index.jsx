@@ -16,11 +16,8 @@ export default function Index({ auth, invoices }) {
     const reject = (paymentId) => {
         const reason = prompt('Masukkan alasan penolakan (wajib diisi):');
         if (reason) {
-            // Kita gunakan Inertia.post karena useForm sudah terpakai untuk 'approve'
-            // dan kita perlu mengirim data alasan
             post(route('admin.payments.reject', paymentId), {
-                rejection_reason: reason,
-            }, {
+                data: { rejection_reason: reason },
                 preserveScroll: true,
             });
         }
@@ -64,7 +61,8 @@ export default function Index({ auth, invoices }) {
                                         return (
                                             <tr key={invoice.id}>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900">{invoice.user.name}</div>
+                                                    {/* PERBAIKAN DI SINI */}
+                                                    <div className="text-sm font-medium text-gray-900">{invoice.user?.name || 'User Dihapus'}</div>
                                                     <div className="text-sm text-gray-500">{invoice.invoice_number}</div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{formatCurrency(invoice.amount)}</td>

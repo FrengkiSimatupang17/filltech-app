@@ -10,7 +10,6 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Carbon\Carbon;
-use App\Models\Package;
 
 class UserController extends Controller
 {
@@ -34,6 +33,7 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', Rule::in(['client', 'technician'])],
             'phone_number' => 'required|string|max:15',
+            'address' => 'nullable|string|max:1000', // <-- LOGIKA DITAMBAHKAN
             'rt' => 'required_if:role,client|nullable|string|max:3',
             'rw' => 'required_if:role,client|nullable|string|max:3',
             'block' => 'required_if:role,client|nullable|string|max:10',
@@ -55,6 +55,7 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'phone_number' => $request->phone_number,
+            'address' => $request->address, // <-- LOGIKA DITAMBAHKAN
             'rt' => $request->rt,
             'rw' => $request->rw,
             'block' => $request->block,
@@ -71,10 +72,8 @@ class UserController extends Controller
         if ($user->role === 'superuser' && $request->user()->role === 'admin') {
             abort(403, 'AKSES DITOLAK: Admin tidak dapat mengedit Superuser.');
         }
-
-         // Ambil data subscription terakhir yang tidak dibatalkan
-        $activeSubscription = $user->subscriptions()->with('package')->where('status', '!=', 'cancelled')->latest()->first();
-
+        
+        // Logika subscription sudah dipindah, jadi method ini bersih
         return Inertia::render('Admin/Users/Edit', [
             'user' => $user
         ]);
@@ -86,22 +85,32 @@ class UserController extends Controller
             abort(403, 'AKSES DITOLAK: Admin tidak dapat mengedit Superuser.');
         }
 
-        // PERBARUI VALIDASI DI SINI
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            // Superuser hanya bisa diubah oleh superuser lain
             'role' => ['required', Rule::in($request->user()->role === 'superuser' ? ['client', 'technician', 'admin', 'superuser'] : ['client', 'technician', 'admin'])],
             'phone_number' => 'required|string|max:15',
+            'address' => 'nullable|string|max:1000', // <-- LOGIKA DITAMBAHKAN
             'rt' => 'required_if:role,client|nullable|string|max:3',
             'rw' => 'required_if:role,client|nullable|string|max:3',
             'block' => 'required_if:role,client|nullable|string|max:10',
             'house_number' => 'required_if:role,client|nullable|string|max:10',
         ]);
 
-        // Karena $fillable sudah diatur di Model, kita bisa langsung update
         $user->update($request->all());
 
         return redirect()->route('admin.users.index')->with('success', 'Data pengguna berhasil diperbarui.');
+    }
+
+    public function destroy(User $user)
+    {
+        if ($user->role === 'superuser' || ($user->role === 'admin' && auth()->user()->role !== 'superuser')) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk menghapus pengguna ini.');
+        }
+        if ($user->id === auth()->id()) {
+            return redirect()->back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+        }
+        $user->delete();
+        return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil dihapus.');
     }
 }

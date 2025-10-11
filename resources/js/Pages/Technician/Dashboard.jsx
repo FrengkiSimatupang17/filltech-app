@@ -8,7 +8,6 @@ import InputLabel from '@/Components/InputLabel';
 export default function Dashboard({ auth, tasks, todaysAttendance }) {
     const { flash } = usePage().props;
     
-    // Form ini untuk aksi "Selesai" yang butuh upload file
     const { data, setData, post: postCompletion, processing: postProcessing, errors } = useForm({
         status: 'completed',
         proof_photo: null,
@@ -38,7 +37,7 @@ export default function Dashboard({ auth, tasks, todaysAttendance }) {
         >
             <Head title="Dashboard Teknisi" />
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                     {flash?.success && (
                         <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
                             <p>{flash.success}</p>
@@ -50,8 +49,8 @@ export default function Dashboard({ auth, tasks, todaysAttendance }) {
                         </div>
                     )}
 
-                    {/* KARTU ABSENSI DENGAN QR CODE */}
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                    {/* Kartu Absensi */}
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900 flex justify-between items-center">
                             <div>
                                 <h3 className="text-lg font-medium">Absensi Hari Ini</h3>
@@ -81,6 +80,7 @@ export default function Dashboard({ auth, tasks, todaysAttendance }) {
                         </div>
                     </div>
 
+                    {/* Daftar Tugas */}
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
                             <h3 className="text-lg font-medium">Daftar Tugas Anda</h3>
@@ -91,9 +91,10 @@ export default function Dashboard({ auth, tasks, todaysAttendance }) {
                                             <div className="flex justify-between items-start">
                                                 <div>
                                                     <p className="font-bold text-lg">{task.title}</p>
-                                                    <p className="text-sm text-gray-600">Klien: {task.client.name}</p>
-                                                    <p className="text-sm text-gray-600">No. HP: {task.client.phone_number}</p>
-                                                    <p className="text-sm text-gray-600">Alamat: RT {task.client.rt}/RW {task.client.rw}, Blok {task.client.block} No. {task.client.house_number}</p>
+                                                    {/* PERBAIKAN DI SINI */}
+                                                    <p className="text-sm text-gray-600">Klien: {task.client?.name || 'Klien Dihapus'}</p>
+                                                    <p className="text-sm text-gray-600">No. HP: {task.client?.phone_number || '-'}</p>
+                                                    <p className="text-sm text-gray-600">Alamat: RT {task.client?.rt}/RW {task.client?.rw}, Blok {task.client?.block} No. {task.client?.house_number}</p>
                                                 </div>
                                                 <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 capitalize">
                                                     {task.status.replace('_', ' ')}

@@ -36,14 +36,15 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'phone_number' => 'required|string|max:15',
+            'address' => 'nullable|string|max:1000',
             'rt' => 'required|string|max:3',
             'rw' => 'required|string|max:3',
             'block' => 'required|string|max:10',
             'house_number' => 'required|string|max:10',
-            'phone_number' => 'required|string|max:15',
         ]);
 
-        // Membuat ID Unik
+        // Membuat ID Pelanggan Unik
         $date = Carbon::now()->format('Ymd');
         $rt = str_pad($request->rt, 3, '0', STR_PAD_LEFT);
         $rw = str_pad($request->rw, 3, '0', STR_PAD_LEFT);
@@ -54,11 +55,12 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'phone_number' => $request->phone_number,
+            'address' => $request->address,
             'rt' => $request->rt,
             'rw' => $request->rw,
             'block' => $request->block,
             'house_number' => $request->house_number,
-            'phone_number' => $request->phone_number,
             'unique_id' => $uniqueId,
             // Role default adalah 'client' sesuai skema database
         ]);

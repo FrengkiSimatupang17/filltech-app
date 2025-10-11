@@ -7,6 +7,9 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Attendance;
 use App\Models\Invoice;
+use App\Models\Payment;
+use App\Models\Task;
+use App\Models\Package;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -25,12 +28,13 @@ class DashboardController extends Controller
             // Ambil data statistik & grafik untuk 30 hari terakhir
             $startDate = Carbon::now()->subDays(30);
             $endDate = Carbon::now();
-
             $query = Invoice::where('status', 'paid')->whereBetween('paid_at', [$startDate, $endDate]);
 
             // Data untuk Stat Cards
             $totalRevenue = (clone $query)->sum('amount');
             $totalTransactions = (clone $query)->count();
+            $pendingTasks = Task::where('status', 'pending')->count();
+            $pendingPayments = Payment::where('status', 'pending_verification')->count();
 
             // Data untuk Grafik Pendapatan Harian
             $dailyRevenue = (clone $query)
@@ -45,6 +49,8 @@ class DashboardController extends Controller
                 'stats' => [
                     'totalRevenue' => $totalRevenue,
                     'totalTransactions' => $totalTransactions,
+                    'pendingTasks' => $pendingTasks,
+                    'pendingPayments' => $pendingPayments,
                 ],
                 'dailyRevenue' => $dailyRevenue,
             ]);
@@ -68,10 +74,12 @@ class DashboardController extends Controller
         // --- Logika Default untuk Klien ---
         $activeSubscription = $user->subscriptions()->with('package')->where('status', 'active')->first();
         $invoices = $user->invoices()->with('payments')->latest()->get();
+        $packages = Package::all();
 
         return Inertia::render('Dashboard', [
             'activeSubscription' => $activeSubscription,
             'invoices' => $invoices,
+            'packages' => $packages,
         ]);
     }
 }

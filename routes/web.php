@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 
-// Import semua controller yang dibutuhkan
+
 use App\Http\Controllers\Superuser\ActivityLogController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\UserController;
@@ -23,7 +23,7 @@ use App\Http\Controllers\Technician\EquipmentController as TechnicianEquipmentCo
 use App\Http\Controllers\Client\PaymentController;
 use App\Http\Controllers\Client\ComplaintController;
 use App\Http\Controllers\Client\InvoiceController as ClientInvoiceController;
-
+use App\Http\Controllers\Client\SubscriptionController as ClientSelfSubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -61,7 +61,7 @@ Route::middleware(['auth', 'role:admin,superuser'])->prefix('admin')->name('admi
 
     // CRUD Routes
     Route::resource('packages', PackageController::class);
-    Route::resource('users', UserController::class)->except(['destroy', 'show']);
+    Route::resource('users', UserController::class)->except(['show']);
     Route::resource('equipment', EquipmentController::class);
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
 
@@ -101,6 +101,10 @@ Route::middleware(['auth', 'role:client'])->prefix('client')->name('client.')->g
     Route::post('invoices/{invoice}/pay', [PaymentController::class, 'store'])->name('invoices.pay');
     Route::post('complaints', [ComplaintController::class, 'store'])->name('complaints.store');
     Route::get('invoices/{invoice}', [ClientInvoiceController::class, 'show'])->name('invoices.show');
+
+    Route::get('packages/{package}', [ClientSelfSubscriptionController::class, 'showPackageDetail'])->name('packages.show');
+    Route::get('packages/{package}/payment', [ClientSelfSubscriptionController::class, 'showPaymentInstruction'])->name('subscriptions.payment');
+    Route::post('subscriptions', [ClientSelfSubscriptionController::class, 'store'])->name('subscriptions.store');
 });
 
 

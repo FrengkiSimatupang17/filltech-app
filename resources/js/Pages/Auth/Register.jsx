@@ -13,6 +13,7 @@ export default function Register() {
         password: '',
         password_confirmation: '',
         phone_number: '',
+        address: '',
         rt: '',
         rw: '',
         block: '',
@@ -36,7 +37,7 @@ export default function Register() {
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                    <InputLabel htmlFor="name" value="Nama Lengkap" />
                     <TextInput
                         id="name"
                         name="name"
@@ -80,7 +81,24 @@ export default function Register() {
                     <InputError message={errors.phone_number} className="mt-2" />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="mt-4">
+                    <InputLabel htmlFor="address" value="Alamat Lengkap (Opsional)" />
+                    <textarea
+                        id="address"
+                        name="address"
+                        value={data.address}
+                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                        onChange={(e) => setData('address', e.target.value)}
+                        rows="3"
+                    ></textarea>
+                    <InputError message={errors.address} className="mt-2" />
+                </div>
+
+                <div className="mt-2">
+                    <p className="text-sm text-gray-600">Detail Alamat (Wajib untuk ID Pelanggan)</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-2">
                     <div>
                         <InputLabel htmlFor="rt" value="RT" />
                         <TextInput
@@ -137,7 +155,6 @@ export default function Register() {
                         <InputError message={errors.house_number} className="mt-2" />
                     </div>
                 </div>
-
 
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />

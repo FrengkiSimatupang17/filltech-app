@@ -12,8 +12,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('package_id')->constrained()->onDelete('cascade');
-            $table->enum('status', ['pending_installation', 'active', 'suspended', 'cancelled'])->default('pending_installation');
+            // PERBAIKAN DI SINI: tambahkan 'pending_payment'
+            $table->enum('status', ['pending_payment', 'pending_installation', 'active', 'suspended', 'cancelled'])->default('pending_payment');
             $table->timestamp('activated_at')->nullable();
+            $table->date('next_billing_date')->nullable();
             $table->timestamps();
         });
     }

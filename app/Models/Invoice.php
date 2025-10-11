@@ -23,7 +23,7 @@ class Invoice extends Model
     ];
 
     /**
-     * Casts untuk memastikan kolom tanggal menjadi objek Carbon.
+     
      */
     protected $casts = [
         'due_date' => 'date',
@@ -41,7 +41,7 @@ class Invoice extends Model
     }
 
     /**
-     * Definisikan relasi: Satu Invoice terikat pada satu Subscription.
+    
      */
     public function subscription(): BelongsTo
     {

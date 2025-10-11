@@ -1,22 +1,21 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import PrimaryButton from '@/Components/PrimaryButton';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 
+// Komponen untuk form pembayaran (tidak berubah)
 const PaymentForm = ({ invoice, closeModal }) => {
     const { data, setData, post, processing, errors } = useForm({
         payment_proof: null,
     });
-
     const submit = (e) => {
         e.preventDefault();
         post(route('client.invoices.pay', invoice.id), {
             onSuccess: () => closeModal(),
         });
     };
-
     return (
         <div className="mt-4 border-t pt-4">
             <form onSubmit={submit}>
@@ -36,11 +35,11 @@ const PaymentForm = ({ invoice, closeModal }) => {
     );
 };
 
+// Komponen untuk form aduan (tidak berubah)
 const ComplaintForm = () => {
-    const { data, setData, post, processing, errors, recentlySuccessful, wasSuccessful } = useForm({
+    const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
         description: '',
     });
-
     const submit = (e) => {
         e.preventDefault();
         post(route('client.complaints.store'), {
@@ -48,7 +47,6 @@ const ComplaintForm = () => {
             onSuccess: () => setData('description', ''),
         });
     };
-
     return (
         <section>
             <header>
@@ -62,7 +60,7 @@ const ComplaintForm = () => {
                     <InputLabel htmlFor="description" value="Deskripsi Kendala" />
                     <textarea
                         id="description"
-                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                        className="mt-1 block w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm"
                         value={data.description}
                         onChange={(e) => setData('description', e.target.value)}
                         rows="4"
@@ -78,8 +76,40 @@ const ComplaintForm = () => {
     );
 };
 
+// PERUBAHAN DI SINI: Komponen daftar paket dibuat lebih ringkas
+const PackageList = ({ packages, activeSubscription }) => {
+    const formatCurrency = (amount) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+    
+    return (
+        <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div className="p-6 text-gray-900">
+                <h3 className="text-lg font-medium text-gray-900">Paket WiFi Tersedia</h3>
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {packages.map(pkg => (
+                        <div key={pkg.id} className="border rounded-lg p-4 flex flex-col hover:shadow-lg transition-shadow duration-200">
+                            <h4 className="font-bold text-green-600">{pkg.name}</h4>
+                            <p className="text-3xl font-bold my-2 text-gray-800">{pkg.speed}</p>
+                            <div className="flex justify-between items-center mt-auto pt-4 border-t">
+                                <p className="text-xl font-semibold text-gray-800">{formatCurrency(pkg.price)}<span className="text-sm font-normal text-gray-500">/bln</span></p>
+                                {!activeSubscription && (
+                                    <Link 
+                                        href={route('client.packages.show', pkg.id)} 
+                                        className="inline-flex items-center px-3 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700"
+                                    >
+                                        Lihat Detail
+                                    </Link>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
 
-export default function Dashboard({ auth, activeSubscription, invoices = [] }) {
+// Komponen Utama Dashboard Klien
+export default function Dashboard({ auth, activeSubscription, invoices = [], packages = [] }) {
     const { flash } = usePage().props;
     const [payingInvoiceId, setPayingInvoiceId] = useState(null);
 
@@ -109,14 +139,16 @@ export default function Dashboard({ auth, activeSubscription, invoices = [] }) {
                     {activeSubscription ? (
                         <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                             <h3 className="text-lg font-medium text-gray-900">Paket Aktif Anda</h3>
-                            <p className="mt-1 text-2xl font-bold text-indigo-600">{activeSubscription.package.name}</p>
+                            <p className="mt-1 text-2xl font-bold text-green-600">{activeSubscription.package.name}</p>
                             <p className="text-gray-600">{activeSubscription.package.speed}</p>
                         </div>
                     ) : (
                          <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                             <h3 className="text-lg font-medium text-gray-900">Anda belum memiliki paket aktif.</h3>
-                        </div>
+                         </div>
                     )}
+
+                    <PackageList packages={packages} activeSubscription={activeSubscription} />
 
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
@@ -154,9 +186,9 @@ export default function Dashboard({ auth, activeSubscription, invoices = [] }) {
                                                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                                                 <a href={route('client.invoices.show', invoice.id)} target="_blank" className="text-gray-600 hover:text-gray-900 mr-4">
                                                                     Download
-                                                                    </a>
+                                                                </a>
                                                                 {invoice.status === 'pending' && !hasPendingPayment && (
-                                                                    <button onClick={() => setPayingInvoiceId(invoice.id)} className="text-indigo-600 hover:text-indigo-900">
+                                                                    <button onClick={() => setPayingInvoiceId(invoice.id)} className="text-green-600 hover:text-green-900">
                                                                         Bayar
                                                                     </button>
                                                                 )}
@@ -189,3 +221,4 @@ export default function Dashboard({ auth, activeSubscription, invoices = [] }) {
         </AuthenticatedLayout>
     );
 }
+

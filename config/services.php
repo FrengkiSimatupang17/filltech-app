@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'payment' => [
+        'bank_name' => env('BANK_NAME'),
+        'account_name' => env('BANK_ACCOUNT_NAME'),
+        'account_number' => env('BANK_ACCOUNT_NUMBER'),
+    ],
+
 ];
