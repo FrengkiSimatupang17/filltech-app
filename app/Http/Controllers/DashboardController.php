@@ -5,81 +5,29 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Attendance;
-use App\Models\Invoice;
-use App\Models\Payment;
-use App\Models\Task;
-use App\Models\Package;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+use App\Actions\Dashboard\GetAdminDashboardData;
+use App\Actions\Dashboard\GetTechnicianDashboardData;
+use App\Actions\Dashboard\GetClientDashboardData;
 
 class DashboardController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     * This single method will direct users to the correct dashboard based on their role.
-     */
     public function __invoke(Request $request)
     {
         $user = Auth::user();
 
-        // --- Logika untuk Admin & Superuser ---
-        if ($user->role === 'admin' || $user->role === 'superuser') {
-            // Ambil data statistik & grafik untuk 30 hari terakhir
-            $startDate = Carbon::now()->subDays(30);
-            $endDate = Carbon::now();
-            $query = Invoice::where('status', 'paid')->whereBetween('paid_at', [$startDate, $endDate]);
+        switch ($user->role) {
+            case 'admin':
+            case 'superuser':
+                $data = (new GetAdminDashboardData)->handle();
+                return Inertia::render('Admin/Dashboard', $data);
 
-            // Data untuk Stat Cards
-            $totalRevenue = (clone $query)->sum('amount');
-            $totalTransactions = (clone $query)->count();
-            $pendingTasks = Task::where('status', 'pending')->count();
-            $pendingPayments = Payment::where('status', 'pending_verification')->count();
+            case 'technician':
+                $data = (new GetTechnicianDashboardData)->handle($user);
+                return Inertia::render('Technician/Dashboard', $data);
 
-            // Data untuk Grafik Pendapatan Harian
-            $dailyRevenue = (clone $query)
-                ->groupBy('date')
-                ->orderBy('date')
-                ->get([
-                    DB::raw('DATE(paid_at) as date'),
-                    DB::raw('SUM(amount) as total')
-                ]);
-
-            return Inertia::render('Admin/Dashboard', [
-                'stats' => [
-                    'totalRevenue' => $totalRevenue,
-                    'totalTransactions' => $totalTransactions,
-                    'pendingTasks' => $pendingTasks,
-                    'pendingPayments' => $pendingPayments,
-                ],
-                'dailyRevenue' => $dailyRevenue,
-            ]);
+            default: // Client
+                $data = (new GetClientDashboardData)->handle($user);
+                return Inertia::render('Dashboard', $data);
         }
-
-        // --- Logika untuk Teknisi ---
-        if ($user->role === 'technician') {
-            $tasks = $user->technicianTasks()->with('client')->where('status', '!=', 'completed')->latest()->get();
-            
-            // Cari status absensi hari ini
-            $todaysAttendance = Attendance::where('user_id', $user->id)
-                ->where('date', Carbon::today())
-                ->first();
-
-            return Inertia::render('Technician/Dashboard', [
-                'tasks' => $tasks,
-                'todaysAttendance' => $todaysAttendance,
-            ]);
-        }
-
-        // --- Logika Default untuk Klien ---
-        $activeSubscription = $user->subscriptions()->with('package')->where('status', 'active')->first();
-        $invoices = $user->invoices()->with('payments')->latest()->get();
-        $packages = Package::all();
-
-        return Inertia::render('Dashboard', [
-            'activeSubscription' => $activeSubscription,
-            'invoices' => $invoices,
-            'packages' => $packages,
-        ]);
     }
 }

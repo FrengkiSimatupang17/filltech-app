@@ -14,7 +14,8 @@ const ToolsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w
 const WifiIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.555a5.5 5.5 0 017.778 0M12 20.25a.75.75 0 100-1.5.75.75 0 000 1.5zM4.444 12.889a10 10 0 0115.112 0" /></svg>;
 const InvoiceIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>;
 const QrIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /><path d="M3 3h2v2H3zm16 16h2v2h-2zM3 19h2v2H3zm16-16h2v2h-2zM9 3h2v2H9zm6 0h2v2h-2zM3 9h2v2H3zm18 0h-2v2h2zM9 19h2v2H9zm6 0h2v2h-2z" /></svg>;
-const LogIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>;
+const ActivityLogIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>;
+
 
 export default function Authenticated({ user, header, children }) {
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -24,6 +25,10 @@ export default function Authenticated({ user, header, children }) {
     const isTechnician = user.role === 'technician';
     const isSuperuser = user.role === 'superuser';
 
+    /**
+     * INI ADALAH SOLUSI DRY (Don't Repeat Yourself)
+     * Komponen ini didefinisikan satu kali dan berisi semua logika menu.
+     */
     const SidebarContent = ({ isCollapsed }) => (
         <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
              <div className="flex items-center justify-center h-8 flex-shrink-0 px-4">
@@ -44,16 +49,10 @@ export default function Authenticated({ user, header, children }) {
                 </NavLink>
 
                 {isTechnician && (
-                    <>
                     <NavLink href={route('technician.equipment.index')} active={route().current('technician.equipment.index')} className={`justify-center md:justify-start`}>
                         <ToolsIcon />
                         <span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Peminjaman Alat</span>
                     </NavLink>
-                    <NavLink href={route('technician.tasks.history')} active={route().current('technician.tasks.history')} className={`justify-center md:justify-start`}>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        <span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Riwayat Tugas</span>
-                    </NavLink>
-                    </>
                 )}
                 
                 {isAdmin && (
@@ -66,6 +65,10 @@ export default function Authenticated({ user, header, children }) {
                         <NavLink href={route('admin.equipment.index')} active={route().current('admin.equipment.index')} className={`justify-center md:justify-start`}><ToolsIcon /><span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Manajemen Alat</span></NavLink>
                         <NavLink href={route('admin.reports.index')} active={route().current('admin.reports.index')} className={`justify-center md:justify-start`}><ReportIcon /><span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Laporan</span></NavLink>
                         <NavLink href={route('admin.attendance.qrcode')} active={route().current('admin.attendance.qrcode')} className={`justify-center md:justify-start`}><QrIcon /><span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>QR Absensi</span></NavLink>
+                        <NavLink href={route('admin.import.index')} active={route().current('admin.import.index')} className={`justify-center md:justify-start`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                            <span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Import Pelanggan</span>
+                        </NavLink>
                     </>
                 )}
 
@@ -73,8 +76,12 @@ export default function Authenticated({ user, header, children }) {
                     <>
                         <p className={`px-4 pt-4 text-xs font-semibold text-gray-400 uppercase ${isCollapsed && 'md:hidden'}`}>Superuser</p>
                         <NavLink href={route('superuser.activity-log.index')} active={route().current('superuser.activity-log.index')} className={`justify-center md:justify-start`}>
-                            <LogIcon />
+                            <ActivityLogIcon />
                             <span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Log Aktivitas</span>
+                        </NavLink>
+                        <NavLink href={route('superuser.settings.index')} active={route().current('superuser.settings.index')} className={`justify-center md:justify-start`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Pengaturan</span>
                         </NavLink>
                     </>
                 )}
@@ -90,12 +97,14 @@ export default function Authenticated({ user, header, children }) {
                 <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
                     <div className="absolute top-0 right-0 -mr-12 pt-2">
                         <button onClick={() => setMobileSidebarOpen(false)} className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                            <svg className="h-6 w-6 text-white" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            <svg className="h-6 w-6 text-white" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
+                    {/* Menggunakan SidebarContent untuk Mobile (tidak terduplikasi) */}
                     <div className="flex-1 h-0 overflow-y-auto">
                         <SidebarContent isCollapsed={false} />
                     </div>
+                    {/* Menu profil mobile dipisah */}
                     <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
                         <div className="flex-shrink-0 w-full group block">
                             <div className="font-medium text-base text-gray-800">{user.name}</div>
@@ -117,6 +126,7 @@ export default function Authenticated({ user, header, children }) {
                 onMouseLeave={() => setDesktopSidebarCollapsed(true)}
             >
                 <div className="flex flex-col flex-grow border-r border-gray-200 bg-white overflow-y-auto">
+                    {/* Menggunakan SidebarContent untuk Desktop (tidak terduplikasi) */}
                     <SidebarContent isCollapsed={desktopSidebarCollapsed} />
                 </div>
             </div>
@@ -125,10 +135,12 @@ export default function Authenticated({ user, header, children }) {
             <div className={`flex flex-col flex-1 transition-all duration-300 ease-in-out ${desktopSidebarCollapsed ? 'md:pl-20' : 'md:pl-64'}`}>
                 <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow">
                     <button onClick={() => setMobileSidebarOpen(true)} className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none md:hidden">
-                        <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
                     <div className="flex-1 px-4 flex justify-between items-center">
-                        <div>{header}</div>
+                        <div className="flex-1 flex">
+                            {header}
+                        </div>
                         <div className="ml-4 flex items-center md:ml-6">
                             <div className="ms-3 relative">
                                 <Dropdown>
@@ -152,9 +164,7 @@ export default function Authenticated({ user, header, children }) {
 
                 <main>
                     <div className="py-6">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                            {children}
-                        </div>
+                        {children}
                     </div>
                 </main>
             </div>
