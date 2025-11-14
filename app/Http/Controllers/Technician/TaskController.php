@@ -9,9 +9,25 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class TaskController extends Controller
 {
+
+    public function history()
+    {
+         $completedTasks = Auth::user()
+         ->technicianTasks()
+          ->where('status', 'completed')
+           ->with('client')
+           ->latest('completed_at')
+           ->paginate(15);
+
+        return Inertia::render('Technician/Tasks/History', [
+            'completedTasks' => $completedTasks,
+            ]);
+    }
+    
     public function updateStatus(Request $request, Task $task)
     {
         if ($task->technician_id !== Auth::id()) {

@@ -44,10 +44,16 @@ export default function Authenticated({ user, header, children }) {
                 </NavLink>
 
                 {isTechnician && (
+                    <>
                     <NavLink href={route('technician.equipment.index')} active={route().current('technician.equipment.index')} className={`justify-center md:justify-start`}>
                         <ToolsIcon />
                         <span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Peminjaman Alat</span>
                     </NavLink>
+                    <NavLink href={route('technician.tasks.history')} active={route().current('technician.tasks.history')} className={`justify-center md:justify-start`}>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Riwayat Tugas</span>
+                    </NavLink>
+                    </>
                 )}
                 
                 {isAdmin && (

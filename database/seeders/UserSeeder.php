@@ -49,13 +49,13 @@ class UserSeeder extends Seeder
         $date = Carbon::now()->format('Ymd');
         $rt_client1 = '001';
         $rw_client1 = '005';
-        $block_client1 = 'A1';
-        $house_number_client1 = '10';
+        $block_client1 = 'C';
+        $house_number_client1 = '42';
         User::create([
-            'name' => 'Budi Klien',
-            'email' => 'budi@example.com',
+            'name' => 'Frengki',
+            'email' => 'simatupangfrengki2@gmail.com',
             'password' => Hash::make('password'),
-            'phone_number' => '081211112222',
+            'phone_number' => '081908792750',
             'role' => 'client',
             'rt' => $rt_client1,
             'rw' => $rw_client1,
@@ -65,23 +65,6 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        // 5. Client 2 (Contoh)
-        $rt_client2 = '003';
-        $rw_client2 = '011';
-        $block_client2 = 'B3';
-        $house_number_client2 = '6';
-        User::create([
-            'name' => 'Citra Klienwati',
-            'email' => 'citra@example.com',
-            'password' => Hash::make('password'),
-            'phone_number' => '081233334444',
-            'role' => 'client',
-            'rt' => $rt_client2,
-            'rw' => $rw_client2,
-            'block' => $block_client2,
-            'house_number' => $house_number_client2,
-            'unique_id' => "{$date}_{$rt_client2}_{$rw_client2}_{$block_client2}{$house_number_client2}",
-            'email_verified_at' => now(),
-        ]);
+        
     }
 }

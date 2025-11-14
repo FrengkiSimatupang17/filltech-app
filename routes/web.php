@@ -24,6 +24,8 @@ use App\Http\Controllers\Client\PaymentController;
 use App\Http\Controllers\Client\ComplaintController;
 use App\Http\Controllers\Client\InvoiceController as ClientInvoiceController;
 use App\Http\Controllers\Client\SubscriptionController as ClientSelfSubscriptionController;
+use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\Auth\CompleteRegistrationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,7 +48,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Rute untuk melengkapi registrasi setelah login via Google
+    Route::get('/register/complete', [CompleteRegistrationController::class, 'create'])->name('register.complete');
+    Route::post('/register/complete', [CompleteRegistrationController::class, 'store']);
 });
+
+// Socialite (Google Login) Routes
+Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirectToProvider'])->name('socialite.redirect');
+Route::get('/auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback'])->name('socialite.callback');
 
 //SUPERUSER ROUTES
 Route::middleware(['auth', 'role:superuser'])->prefix('superuser')->name('superuser.')->group(function () {
@@ -84,6 +94,7 @@ Route::middleware(['auth', 'role:admin,superuser'])->prefix('admin')->name('admi
 
 // TECHNICIAN ROUTES
 Route::middleware(['auth', 'role:technician'])->prefix('technician')->name('technician.')->group(function () {
+    Route::get('tasks/history', [TechnicianTaskController::class, 'history'])->name('tasks.history');
     Route::post('tasks/{task}/update-status', [TechnicianTaskController::class, 'updateStatus'])->name('tasks.update-status');
 
     // Attendance Routes
