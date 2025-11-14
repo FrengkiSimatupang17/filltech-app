@@ -16,7 +16,7 @@ use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Admin\QrCodeController;
-use App\Http\Controllers\Admin\ImportController; // <-- TAMBAHKAN IMPORT INI
+use App\Http\Controllers\Admin\ImportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Technician\TaskController as TechnicianTaskController;
 use App\Http\Controllers\Technician\AttendanceController;
@@ -27,6 +27,7 @@ use App\Http\Controllers\Client\InvoiceController as ClientInvoiceController;
 use App\Http\Controllers\Client\SubscriptionController as ClientSelfSubscriptionController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Auth\CompleteRegistrationController;
+use App\Models\Package;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +39,7 @@ Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
+        'packages' => Package::all(),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);

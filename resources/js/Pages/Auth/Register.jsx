@@ -6,7 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { zodRegistrationSchema } from '@/validationSchema';
-import { z } from 'zod'; // Import z
+import { z } from 'zod';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset, setError, clearErrors } = useForm({
@@ -28,21 +28,15 @@ export default function Register() {
         };
     }, []);
 
-    // --- FUNGSI VALIDASI YANG DIPERBAIKI ---
     const validateField = (field) => {
         try {
-            // 1. Validasi hanya nilai dari field yang spesifik
             zodRegistrationSchema.shape[field].parse(data[field]);
-            // 2. Jika berhasil, hapus error
             clearErrors(field);
         } catch (e) {
-            // 3. Jika gagal (melempar error), tangkap dan tampilkan pesan
             if (e instanceof z.ZodError) {
                 setError(field, e.errors[0].message);
             }
         }
-
-        // 4. Logika khusus untuk konfirmasi password
         if (field === 'password_confirmation' || field === 'password') {
             if (data.password && data.password_confirmation && data.password !== data.password_confirmation) {
                 setError('password_confirmation', 'Konfirmasi password tidak cocok.');
@@ -54,19 +48,15 @@ export default function Register() {
 
     const submit = (e) => {
         e.preventDefault();
-        
-        // Validasi penuh sebelum submit (logika ini sudah benar)
         const result = zodRegistrationSchema.safeParse(data);
         if (!result.success) {
             const fieldErrors = result.error.flatten().fieldErrors;
-            // Hapus error lama sebelum set yang baru
             clearErrors();
             for (const field in fieldErrors) {
                 setError(field, fieldErrors[field][0]);
             }
             return;
         }
-
         post(route('register'));
     };
 
@@ -74,45 +64,22 @@ export default function Register() {
         <GuestLayout>
             <Head title="Register" />
 
-            <form onSubmit={submit} noValidate> {/* Tambahkan noValidate untuk menonaktifkan validasi HTML5 bawaan */}
+            <form onSubmit={submit} noValidate>
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
-                    <TextInput
-                        id="name"
-                        value={data.name}
-                        className="mt-1 block w-full"
-                        onChange={(e) => setData('name', e.target.value)}
-                        onBlur={() => validateField('name')} // Memicu validasi saat fokus hilang
-                        required
-                    />
+                    <InputLabel htmlFor="name" value="Nama Lengkap" />
+                    <TextInput id="name" value={data.name} className="mt-1 block w-full" onChange={(e) => setData('name', e.target.value)} onBlur={() => validateField('name')} required />
                     <InputError message={errors.name} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="email" value="Email" />
-                    <TextInput
-                        id="email"
-                        type="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        onChange={(e) => setData('email', e.target.value)}
-                        onBlur={() => validateField('email')}
-                        required
-                    />
+                    <TextInput id="email" type="email" value={data.email} className="mt-1 block w-full" onChange={(e) => setData('email', e.target.value)} onBlur={() => validateField('email')} required />
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="phone_number" value="Nomor WhatsApp" />
-                    <TextInput
-                        id="phone_number"
-                        type="text"
-                        value={data.phone_number}
-                        className="mt-1 block w-full"
-                        onChange={(e) => setData('phone_number', e.target.value)}
-                        onBlur={() => validateField('phone_number')}
-                        required
-                    />
+                    <TextInput id="phone_number" type="text" value={data.phone_number} className="mt-1 block w-full" onChange={(e) => setData('phone_number', e.target.value)} onBlur={() => validateField('phone_number')} required />
                     <InputError message={errors.phone_number} className="mt-2" />
                 </div>
                 
@@ -121,13 +88,17 @@ export default function Register() {
                     <textarea
                         id="address"
                         value={data.address}
-                        className="mt-1 block w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm"
+                        className="mt-1 block w-full bg-gray-900 border-gray-600 text-gray-200 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm"
                         onChange={(e) => setData('address', e.target.value)}
                         rows="3"
                     ></textarea>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="mt-2">
+                    <p className="text-sm text-gray-400">Detail Alamat (Wajib untuk ID Pelanggan)</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-2">
                     <div>
                         <InputLabel htmlFor="rt" value="RT" />
                         <TextInput id="rt" value={data.rt} className="mt-1 block w-full" onChange={(e) => setData('rt', e.target.value)} onBlur={() => validateField('rt')} required />
@@ -155,45 +126,33 @@ export default function Register() {
 
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
-                    <TextInput
-                        id="password"
-                        type="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        onChange={(e) => setData('password', e.target.value)}
-                        onBlur={() => validateField('password')}
-                        required
-                    />
+                    <TextInput id="password" type="password" value={data.password} className="mt-1 block w-full" onChange={(e) => setData('password', e.targe.value)} onBlur={() => validateField('password')} required />
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-                    <TextInput
-                        id="password_confirmation"
-                        type="password"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
-                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                        onBlur={() => validateField('password_confirmation')}
-                        required
-                    />
+                    <TextInput id="password_confirmation" type="password" value={data.password_confirmation} className="mt-1 block w-full" onChange={(e) => setData('password_confirmation', e.target.value)} onBlur={() => validateField('password_confirmation')} required />
                     <InputError message={errors.password_confirmation} className="mt-2" />
                 </div>
-
-                {/* Tombol Google dan link Login */}
-                <div className="my-4 flex items-center before:flex-1 before:border-t before:border-gray-300 before:mt-0.5 after:flex-1 after:border-t after:border-gray-300 after:mt-0.5">
-                    <p className="text-center font-semibold mx-4 mb-0">Atau</p>
+                
+                <div className="my-4 flex items-center before:flex-1 before:border-t before:border-gray-600 before:mt-0.5 after:flex-1 after:border-t after:border-gray-600 after:mt-0.5">
+                    <p className="text-center font-semibold mx-4 mb-0 text-gray-400">Atau</p>
                 </div>
-                <a href={route('socialite.redirect', 'google')} className="flex items-center justify-center w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+
+                <a href={route('socialite.redirect', 'google')} className="flex items-center justify-center w-full px-4 py-2 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-300 bg-gray-700 hover:bg-gray-600">
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v8.51h12.8c-.57 3.32-2.31 6.12-4.96 7.96l7.98 6.19C45.27 38.91 48 32.16 48 24.55z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.98-6.19c-2.11 1.45-4.84 2.31-7.91 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
                     Daftar dengan Google
                 </a>
 
                 <div className="flex items-center justify-end mt-4">
-                    <Link href={route('login')} className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md">
+                    <Link
+                        href={route('login')}
+                        className="underline text-sm text-gray-400 hover:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
                         Already registered?
                     </Link>
+
                     <PrimaryButton className="ms-4" disabled={processing}>
                         Register
                     </PrimaryButton>

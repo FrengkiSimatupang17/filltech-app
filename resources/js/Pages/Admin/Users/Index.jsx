@@ -1,10 +1,35 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, useForm } from '@inertiajs/react';
 import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import Modal from '@/Components/Modal';
+import { useState } from 'react';
 
 export default function Index({ auth, users }) {
     const { flash } = usePage().props;
     const loggedInUser = auth.user;
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
+    const { delete: destroy, processing } = useForm();
+
+    const openDeleteModal = (user) => {
+        setUserToDelete(user);
+        setShowDeleteModal(true);
+    };
+
+    const closeDeleteModal = () => {
+        setShowDeleteModal(false);
+        setUserToDelete(null);
+    };
+
+    const deleteUser = (e) => {
+        e.preventDefault();
+        destroy(route('admin.users.destroy', userToDelete.id), {
+            preserveScroll: true,
+            onSuccess: () => closeDeleteModal(),
+        });
+    };
 
     return (
         <AuthenticatedLayout
@@ -15,6 +40,16 @@ export default function Index({ auth, users }) {
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    {flash?.success && (
+                        <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+                            <p>{flash.success}</p>
+                        </div>
+                    )}
+                     {flash?.error && (
+                        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                            <p>{flash.error}</p>
+                        </div>
+                    )}
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
                             <div className="flex justify-end mb-4">
@@ -39,8 +74,8 @@ export default function Index({ auth, users }) {
                                             <tr key={user.id}>
                                                 <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm text-gray-900">{user.email}</div>
-                                                    <div className="text-sm text-gray-500">{user.phone_number}</div>
+                                                    <div className="text-sm text-gray-900">{user.email || user.unique_id}</div>
+                                                    <div className="text-sm text-gray-500">{user.phone_number || 'No HP'}</div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     {user.role === 'client' ? (
@@ -59,33 +94,25 @@ export default function Index({ auth, users }) {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                     {user.role === 'client' && !hasActiveSubscription && (
-                                                        <Link
-                                                        href={route('admin.client-subscriptions.create', user.id)}
-                                                        className="text-white bg-indigo-600 hover:bg-indigo-700 font-bold py-2 px-4 rounded"
-                                                        >
+                                                        <Link href={route('admin.client-subscriptions.create', user.id)} className="text-white bg-green-600 hover:bg-green-700 font-bold py-2 px-4 rounded">
                                                             Buat Langganan
                                                         </Link>
                                                     )}
 
                                                     {(loggedInUser.role === 'superuser' || user.role !== 'superuser') && (
-                                                        <Link
-                                                        href={route('admin.users.edit', user.id)}
-                                                        className="text-indigo-600 hover:text-indigo-900 ml-4"
-                                                        >
+                                                        <Link href={route('admin.users.edit', user.id)} className="text-indigo-600 hover:text-indigo-900 ml-4">
                                                             Edit
-                                                            </Link>
+                                                        </Link>
                                                     )}
 
                                                     {(loggedInUser.role === 'superuser' || (loggedInUser.role === 'admin' && user.role !== 'admin' && user.role !== 'superuser')) && user.id !== loggedInUser.id && (
-                                                        <Link
-                                                        href={route('admin.users.destroy', user.id)}
-                                                        method="delete"
-                                                        as="button"
-                                                        onBefore={() => confirm('Anda yakin ingin menghapus pengguna ini?')}
-                                                        className="text-red-600 hover:text-red-900 ml-4"
+                                                        <button 
+                                                            onClick={() => openDeleteModal(user)}
+                                                            className="text-red-600 hover:text-red-900 ml-4"
+                                                            disabled={processing}
                                                         >
                                                             Hapus
-                                                        </Link>
+                                                        </button>
                                                     )}
                                                 </td>
                                             </tr>
@@ -97,6 +124,25 @@ export default function Index({ auth, users }) {
                     </div>
                 </div>
             </div>
+
+            <Modal show={showDeleteModal} onClose={closeDeleteModal} maxWidth="sm">
+                <form onSubmit={deleteUser} className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900">
+                        Yakin ingin menghapus pengguna ini?
+                    </h2>
+                    <p className="mt-1 text-sm text-gray-600">
+                        Anda akan menghapus: <span className="font-medium">{userToDelete?.name}</span>.
+                        Aksi ini akan menyembunyikan data pengguna (Soft Delete) namun tidak menghapus riwayat tagihan terkait.
+                    </p>
+                    <div className="mt-6 flex justify-end">
+                        <SecondaryButton onClick={closeDeleteModal}>Batal</SecondaryButton>
+                        <PrimaryButton className="ms-3 bg-red-600 hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:ring-red-500" disabled={processing}>
+                            Ya, Hapus Pengguna
+                        </PrimaryButton>
+                    </div>
+                </form>
+            </Modal>
+
         </AuthenticatedLayout>
     );
 }
