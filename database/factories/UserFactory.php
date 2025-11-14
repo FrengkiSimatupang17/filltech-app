@@ -6,13 +6,10 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
 class UserFactory extends Factory
 {
     /**
-     * The current password being used by the factory.
+     * Tentukan password default untuk semua user buatan factory.
      */
     protected static ?string $password;
 
@@ -29,6 +26,13 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'role' => 'client', // Default role adalah client
+            'phone_number' => fake()->phoneNumber(),
+            'rt' => fake()->numerify('00#'),
+            'rw' => fake()->numerify('00#'),
+            'block' => fake()->word(),
+            'house_number' => fake()->numerify('##'),
+            'unique_id' => fake()->uuid(),
         ];
     }
 
