@@ -28,6 +28,7 @@ export default function Authenticated({ user, header, children }) {
     /**
      * INI ADALAH SOLUSI DRY (Don't Repeat Yourself)
      * Komponen ini didefinisikan satu kali dan berisi semua logika menu.
+     * `isCollapsed` hanya digunakan untuk menyembunyikan teks di desktop.
      */
     const SidebarContent = ({ isCollapsed }) => (
         <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
@@ -49,10 +50,16 @@ export default function Authenticated({ user, header, children }) {
                 </NavLink>
 
                 {isTechnician && (
-                    <NavLink href={route('technician.equipment.index')} active={route().current('technician.equipment.index')} className={`justify-center md:justify-start`}>
-                        <ToolsIcon />
-                        <span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Peminjaman Alat</span>
-                    </NavLink>
+                    <>
+                        <NavLink href={route('technician.equipment.index')} active={route().current('technician.equipment.index')} className={`justify-center md:justify-start`}>
+                            <ToolsIcon />
+                            <span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Peminjaman Alat</span>
+                        </NavLink>
+                        <NavLink href={route('technician.tasks.history')} active={route().current('technician.tasks.history')} className={`justify-center md:justify-start`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span className={`ml-3 ${isCollapsed && 'md:hidden'}`}>Riwayat Tugas</span>
+                        </NavLink>
+                    </>
                 )}
                 
                 {isAdmin && (
@@ -146,7 +153,7 @@ export default function Authenticated({ user, header, children }) {
                                 <Dropdown>
                                     <Dropdown.Trigger>
                                         <span className="inline-flex rounded-md">
-                                            <button type="button" className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none">
+                                            <button typeType="button" className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none">
                                                 {user.name}
                                                 <svg className="ms-2 -me-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd"/></svg>
                                             </button>
